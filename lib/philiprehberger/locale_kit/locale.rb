@@ -8,6 +8,8 @@ module Philiprehberger
     # - language: 2-3 character ISO 639 language code (required)
     # - script: 4 character ISO 15924 script code (optional)
     # - region: 2 alpha ISO 3166-1 or 3 digit UN M.49 code (optional)
+    # - variant: 5-8 alphanumeric variant subtag (optional)
+    # - extensions: Unicode extension subtags (optional)
     #
     # @example
     #   locale = Locale.new("en", region: "US")
@@ -25,20 +27,31 @@ module Philiprehberger
       # @return [String, nil] the region subtag (e.g., "US", "419") or nil
       attr_reader :region
 
+      # @return [String, nil] the variant subtag (e.g., "valencia", "posix") or nil
+      attr_reader :variant
+
+      # @return [Hash] the extension subtags (e.g., { "u" => "ca-buddhist" })
+      attr_reader :extensions
+
       # Creates a new Locale instance.
       #
       # @param language [String] 2-3 character language subtag
       # @param script [String, nil] 4 character script subtag
       # @param region [String, nil] 2 alpha or 3 digit region subtag
+      # @param variant [String, nil] 5-8 alphanumeric variant subtag
+      # @param extensions [Hash] extension subtags keyed by singleton letter
       # @raise [ArgumentError] if language is invalid
-      def initialize(language, script: nil, region: nil)
+      def initialize(language, script: nil, region: nil, variant: nil, extensions: {})
         validate_language!(language)
         validate_script!(script) if script
         validate_region!(region) if region
+        validate_variant!(variant) if variant
 
         @language = language.downcase.freeze
         @script = script&.then { |s| "#{s[0].upcase}#{s[1..].downcase}" }&.freeze
         @region = region&.upcase&.freeze
+        @variant = variant&.downcase&.freeze
+        @extensions = extensions.each_with_object({}) { |(k, v), h| h[k.to_s.downcase] = v.to_s.downcase }.freeze
         freeze
       end
 
@@ -49,20 +62,56 @@ module Philiprehberger
         parts = [language]
         parts << script if script
         parts << region if region
+        parts << variant if variant
+        extensions.sort.each do |singleton, value|
+          parts << singleton
+          parts << value
+        end
         parts.join('-')
       end
 
       # Returns the parent locale by removing the most specific subtag.
       #
-      # en-Latn-US -> en-Latn -> en -> nil
+      # en-US-valencia -> en-US -> en -> nil
+      # en-u-ca-buddhist -> en -> nil
       #
       # @return [Locale, nil] the parent locale, or nil if this is a language-only locale
       def parent
-        if region
+        if !extensions.empty?
+          self.class.new(language, script: script, region: region, variant: variant)
+        elsif variant
+          self.class.new(language, script: script, region: region)
+        elsif region
           self.class.new(language, script: script)
         elsif script
           self.class.new(language)
         end
+      end
+
+      # Returns a human-readable display name for the locale.
+      #
+      # @param in_locale [nil] reserved for future use
+      # @return [String] human-readable name (e.g., "English (United States)")
+      def display_name(in_locale: nil)
+        lang_name = Data::LANGUAGES[language]
+        return to_s unless lang_name
+
+        parts = [lang_name]
+        qualifiers = []
+        qualifiers << Data::REGIONS[region] if region && Data::REGIONS[region]
+        qualifiers << variant.capitalize if variant
+
+        return "#{parts.first} (#{qualifiers.join(', ')})" unless qualifiers.empty?
+
+        parts.first
+      end
+
+      # Returns the language family for this locale's language.
+      #
+      # @return [Symbol] language family (:germanic, :romance, :slavic,
+      #   :sino_tibetan, :japonic, :koreanic, :semitic, :other)
+      def language_family
+        Data::LANGUAGE_FAMILIES.fetch(language, :other)
       end
 
       # Tests whether another locale is a prefix match of this locale.
@@ -89,14 +138,18 @@ module Philiprehberger
       def ==(other)
         return false unless other.is_a?(Locale)
 
-        language == other.language && script == other.script && region == other.region
+        language == other.language &&
+          script == other.script &&
+          region == other.region &&
+          variant == other.variant &&
+          extensions == other.extensions
       end
 
       alias eql? ==
 
       # @return [Integer] hash code based on all subtags
       def hash
-        [language, script, region].hash
+        [language, script, region, variant, extensions].hash
       end
 
       # Comparison for sorting. Orders by language, then script, then region.
@@ -112,7 +165,10 @@ module Philiprehberger
         result = (script || '') <=> (other.script || '')
         return result unless result.zero?
 
-        (region || '') <=> (other.region || '')
+        result = (region || '') <=> (other.region || '')
+        return result unless result.zero?
+
+        (variant || '') <=> (other.variant || '')
       end
 
       # @return [String] inspection string
@@ -135,6 +191,11 @@ module Philiprehberger
       def validate_region!(reg)
         raise ArgumentError, "region must be a 2 alpha or 3 digit string, got: #{reg.inspect}" unless
           reg.is_a?(String) && reg.match?(/\A([a-zA-Z]{2}|\d{3})\z/)
+      end
+
+      def validate_variant!(var)
+        raise ArgumentError, "variant must be a 5-8 alphanumeric string, got: #{var.inspect}" unless
+          var.is_a?(String) && var.match?(/\A[a-zA-Z0-9]{5,8}\z/)
       end
     end
   end

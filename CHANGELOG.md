@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-03-28
+
+### Added
+
+- Variant subtag support: parse and store variant subtags (e.g., `en-US-valencia`) with `Locale#variant` accessor
+- Extension subtag support: parse Unicode extension subtags (e.g., `en-u-ca-buddhist`) with `Locale#extensions` returning a hash
+- Display name: `Locale#display_name` returning human-readable name (e.g., "English (United States)")
+- Language family: `Locale#language_family` returning family symbol (:germanic, :romance, :slavic, :sino_tibetan, :japonic, :koreanic, :semitic, :other)
+- Language lookup: `LocaleKit.languages` returning hash of ISO 639-1 codes to English names
+- Region lookup: `LocaleKit.regions` returning hash of ISO 3166-1 alpha-2 codes to English names
+- GitHub issue templates (bug report, feature request)
+- Dependabot configuration
+- Pull request template
+
 ## [0.1.1] - 2026-03-26
 
 ### Added
