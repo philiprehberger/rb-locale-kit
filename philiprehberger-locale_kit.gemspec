@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.email = ['me@philiprehberger.com']
   spec.summary = 'BCP 47 locale parsing, matching, and content negotiation'
   spec.description = 'Parse BCP 47 language tags, negotiate content language from Accept-Language headers, ' \
-                       'and match locales with fallback chains. Zero dependencies.'
+                     'and match locales with fallback chains. Zero dependencies.'
   spec.homepage = 'https://philiprehberger.com/open-source-packages/ruby/philiprehberger-locale_kit'
   spec.license = 'MIT'
   spec.required_ruby_version = '>= 3.1.0'
