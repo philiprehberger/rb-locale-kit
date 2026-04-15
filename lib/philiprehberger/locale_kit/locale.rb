@@ -131,6 +131,28 @@ module Philiprehberger
         other.region.nil? || region == other.region
       end
 
+      # Tests whether another locale shares the same primary language subtag.
+      #
+      # Comparison is case-insensitive and ignores script, region, variant, and extensions.
+      # For example, "en-US" is compatible with "en-GB", and "en" is compatible with "en-US".
+      #
+      # @param other [Locale, String] the locale or BCP 47 tag to compare against
+      # @return [Boolean] true if both locales share the same primary language subtag,
+      #   false if other is nil, not a Locale/String, or an unparseable tag
+      def compatible?(other)
+        if other.is_a?(String)
+          begin
+            other = LocaleKit.parse(other)
+          rescue ArgumentError
+            return false
+          end
+        end
+
+        return false unless other.is_a?(Locale)
+
+        language.downcase == other.language.downcase
+      end
+
       # Equality based on all subtag values.
       #
       # @param other [Object] object to compare

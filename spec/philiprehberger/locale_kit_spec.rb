@@ -411,6 +411,50 @@ RSpec.describe Philiprehberger::LocaleKit do
       end
     end
 
+    describe '#compatible?' do
+      it 'is compatible when regions differ but language matches' do
+        locale = Philiprehberger::LocaleKit.parse('en-US')
+        expect(locale.compatible?(Philiprehberger::LocaleKit.parse('en-GB'))).to be true
+      end
+
+      it 'is not compatible when languages differ' do
+        locale = Philiprehberger::LocaleKit.parse('en-US')
+        expect(locale.compatible?(Philiprehberger::LocaleKit.parse('fr-FR'))).to be false
+      end
+
+      it 'is compatible when one side is language-only' do
+        locale = Philiprehberger::LocaleKit.parse('en')
+        expect(locale.compatible?(Philiprehberger::LocaleKit.parse('en-US'))).to be true
+      end
+
+      it 'accepts a String tag' do
+        locale = Philiprehberger::LocaleKit.parse('en-US')
+        expect(locale.compatible?('en-GB')).to be true
+        expect(locale.compatible?('fr')).to be false
+      end
+
+      it 'returns false for an invalid String tag' do
+        locale = Philiprehberger::LocaleKit.parse('en-US')
+        expect(locale.compatible?('not a tag!')).to be false
+      end
+
+      it 'returns false for nil' do
+        locale = Philiprehberger::LocaleKit.parse('en-US')
+        expect(locale.compatible?(nil)).to be false
+      end
+
+      it 'is case-insensitive on the primary language subtag' do
+        locale = described_class.new('en')
+        other = described_class.new('EN', region: 'US')
+        expect(locale.compatible?(other)).to be true
+      end
+
+      it 'ignores script and variant when comparing' do
+        locale = Philiprehberger::LocaleKit.parse('zh-Hant-TW')
+        expect(locale.compatible?('zh-Hans-CN')).to be true
+      end
+    end
+
     describe '#==' do
       it 'is equal for same subtags' do
         a = described_class.new('en', region: 'US')
