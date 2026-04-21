@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-04-15
+
+### Added
+
+- Language compatibility: `Locale#compatible?(other)` returns `true` when both locales share the same primary language subtag (case-insensitive), regardless of script, region, variant, or extensions. Accepts either a `Locale` instance or a BCP 47 tag string; returns `false` for unparseable strings or `nil`
+
 ## [0.2.1] - 2026-03-31
 
 ### Changed

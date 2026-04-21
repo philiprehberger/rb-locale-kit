@@ -93,6 +93,19 @@ Philiprehberger::LocaleKit.regions["US"]  #=> "United States"
 Philiprehberger::LocaleKit.regions["JP"]  #=> "Japan"
 ```
 
+### Language Compatibility
+
+```ruby
+require "philiprehberger/locale_kit"
+
+en_us = Philiprehberger::LocaleKit.parse("en-US")
+en_us.compatible?("en-GB")  #=> true  (same primary language)
+en_us.compatible?("en")      #=> true
+en_us.compatible?("fr-FR")  #=> false
+en_us.compatible?("bogus!") #=> false (invalid tag)
+en_us.compatible?(nil)       #=> false
+```
+
 ### Content Negotiation
 
 ```ruby
@@ -142,6 +155,7 @@ entries[0][:quality]     #=> 1.0
 | `#to_s` | Canonical BCP 47 string (e.g., `"en-US"`) |
 | `#parent` | Parent locale (`en-US` -> `en` -> `nil`) |
 | `#match?(other)` | True if other is a prefix match |
+| `#compatible?(other)` | True if other shares the same primary language subtag (accepts `Locale` or tag string) |
 | `#display_name(in_locale: nil)` | Human-readable name (e.g., `"English (United States)"`) |
 | `#language_family` | Language family symbol (e.g., `:germanic`) |
 | `#==(other)` | Equality based on all subtags |
