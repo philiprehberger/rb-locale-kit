@@ -70,6 +70,18 @@ module Philiprehberger
       Data::LANGUAGES
     end
 
+    # Look up the English name for an ISO 639-1 language code.
+    #
+    # Case-insensitive. Returns `nil` for unknown codes or non-String input.
+    #
+    # @param code [String] a 2-letter ISO 639-1 code (e.g. "en", "EN")
+    # @return [String, nil] the English language name, or nil if unknown
+    def self.language_name(code)
+      return nil unless code.is_a?(String)
+
+      Data::LANGUAGES[code.downcase]
+    end
+
     # Returns a hash of common ISO 3166-1 alpha-2 region codes to English names.
     #
     # @return [Hash<String, String>] region code to name mapping

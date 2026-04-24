@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-04-24
+
+### Added
+- `LocaleKit.language_name(code)` — look up the English name for an ISO 639-1 language code (case-insensitive); returns `nil` for unknown codes or non-String input
+
 ## [0.3.0] - 2026-04-15
 
 ### Added

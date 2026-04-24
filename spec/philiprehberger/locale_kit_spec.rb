@@ -780,4 +780,24 @@ RSpec.describe Philiprehberger::LocaleKit do
       expect(described_class.regions.size).to be >= 50
     end
   end
+
+  describe '.language_name' do
+    it 'returns the English name for a known lowercase code' do
+      expect(described_class.language_name('en')).to eq('English')
+    end
+
+    it 'is case-insensitive' do
+      expect(described_class.language_name('EN')).to eq('English')
+      expect(described_class.language_name('Fr')).to eq('French')
+    end
+
+    it 'returns nil for an unknown code' do
+      expect(described_class.language_name('zz')).to be_nil
+    end
+
+    it 'returns nil for non-String input' do
+      expect(described_class.language_name(nil)).to be_nil
+      expect(described_class.language_name(:en)).to be_nil
+    end
+  end
 end

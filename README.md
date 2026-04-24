@@ -91,6 +91,11 @@ Philiprehberger::LocaleKit.languages["ja"]  #=> "Japanese"
 
 Philiprehberger::LocaleKit.regions["US"]  #=> "United States"
 Philiprehberger::LocaleKit.regions["JP"]  #=> "Japan"
+
+# Single-lookup convenience (case-insensitive)
+Philiprehberger::LocaleKit.language_name("en")  #=> "English"
+Philiprehberger::LocaleKit.language_name("FR")  #=> "French"
+Philiprehberger::LocaleKit.language_name("zz")  #=> nil
 ```
 
 ### Language Compatibility
@@ -141,6 +146,7 @@ entries[0][:quality]     #=> 1.0
 | `.negotiate(requested, available, default: nil)` | Find the best matching locale with fallback chains |
 | `.parse_accept_language(header)` | Parse an Accept-Language header into `[{locale:, quality:}]` |
 | `.languages` | Hash of ISO 639-1 language codes to English names |
+| `.language_name(code)` | English name for an ISO 639-1 code (case-insensitive); `nil` if unknown |
 | `.regions` | Hash of ISO 3166-1 alpha-2 region codes to English names |
 
 ### `Philiprehberger::LocaleKit::Locale`
